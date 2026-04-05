@@ -2,7 +2,7 @@
 
 > ⚠️ **This script was generated with AI assistance and may contain bugs. It works on the author's setup, but use it at your own risk.**
 
-> This is a proof of concept. The goal was to prove that cross-VLAN Spotify Connect can work, and to document how and why. The script works, but it is far from production-ready. It likely has edge cases, error handling gaps, and things that could be done better by someone with deeper knowledge of networking and Python. If you know what you are doing, please feel free to use the work and improve it — you are very welcome. The author lacks the expertise to take this further, and hopes this saves someone else the hours of troubleshooting that went into figuring it out.
+> This is a proof of concept. The goal was to prove that cross-VLAN Spotify Connect for Yamaha devices can work, and to document how and why. The script works, but it is far from production-ready. It likely has edge cases, error handling gaps, and things that could be done better by someone with deeper knowledge of networking and Python. If you know what you are doing, please feel free to use the work and improve it — you are very welcome. The author lacks the expertise to take this further, and hopes this saves someone else the hours of troubleshooting that went into figuring it out.
 
 A lightweight Python script for OpenWrt routers that acts as a Spotify Connect proxy between a guest Wi-Fi network and a Yamaha MusicCast receiver (or any other Spotify Connect device) located on the main LAN.
 
@@ -12,7 +12,7 @@ Spotify Connect requires the phone and the target device to be on the same subne
 
 ## How It Works
 
-The script runs three components simultaneously on the router:
+The script runs two components simultaneously on the router:
 
 **HTTP Proxy** — listens on the router's guest IP (e.g. `192.168.2.1:80`) and forwards all requests to the Yamaha receiver on the LAN (`192.168.1.220:80`). From Spotify's perspective, the device appears to be inside the guest subnet.
 
