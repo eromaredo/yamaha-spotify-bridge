@@ -237,12 +237,6 @@ This script came out of an extensive troubleshooting session. Here is a summary 
 
 **Why it didn't work:** The firewall was never the core issue. `tcpdump` confirmed that when the phone was on the guest network, it never even attempted to connect to `192.168.1.220` — because Spotify hid the device before any TCP connection was made. Ports don't help if the device is not shown in the first place.
 
-### NAT / DNAT (virtual IP)
-
-**What was tried:** Adding a virtual IP `192.168.2.220` on the guest interface with a DNAT rule redirecting it to `192.168.1.220`, so the receiver would appear to have a guest-subnet address.
-
-**Why it didn't work:** Spotify gets the receiver's real IP (`192.168.1.220`) from the Spotify cloud and uses that IP for its local reachability check. The virtual IP was unknown to Spotify, so it was never queried.
-
 ### IP address mapping via nftables (192.168.2.220 → 192.168.1.220)
 
 **What was tried:** Adding a virtual IP `192.168.2.220` on the guest bridge interface and creating nftables DNAT rules to redirect traffic from that address to the real Yamaha IP:
