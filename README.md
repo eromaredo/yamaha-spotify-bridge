@@ -18,12 +18,10 @@ The script runs three components simultaneously on the router:
 
 **mDNS announcer** — advertises the bridge as a `_spotify-connect._tcp` service on the guest network. It both sends proactive announcements every 5 seconds and responds to incoming mDNS queries from phones.
 
-**SSDP announcer** — sends UPnP NOTIFY messages and responds to M-SEARCH requests on the guest network, covering devices that use SSDP for discovery instead of mDNS.
-
 ```
 Phone (192.168.2.x)
     │
-    │  mDNS / SSDP discovery
+    │  mDNS discovery
     ▼
 Router bridge (192.168.2.1:80)   ← script listens here
     │

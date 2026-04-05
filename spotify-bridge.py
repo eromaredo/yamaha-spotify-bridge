@@ -19,13 +19,11 @@ YAMAHA_IP   = "192.168.1.220"
 YAMAHA_PORT = 80
 
 BRIDGE_IP   = "192.168.2.1"  # Router IP in guest network
-BRIDGE_PORT = 80             # Port to listen on (avoid 80 if LuCI uses it)
+BRIDGE_PORT = 8080            # Port to listen on (avoid 80 if LuCI uses it)
 
 DEVICE_NAME = "Yamaha RN-803D"
 MDNS_ADDR   = "224.0.0.251"
 MDNS_PORT   = 5353
-SSDP_ADDR   = "239.255.255.250"
-SSDP_PORT   = 1900
 # ---------------------
 
 
@@ -243,76 +241,6 @@ def run_mdns():
             log(f"[mDNS] recv error: {e}")
 
 
-# ── SSDP ────────────────────────────────────────────────────────────────────
-
-def make_ssdp_notify():
-    return (
-        "NOTIFY * HTTP/1.1\r\n"
-        f"HOST: {SSDP_ADDR}:{SSDP_PORT}\r\n"
-        "CACHE-CONTROL: max-age=1800\r\n"
-        f"LOCATION: http://{BRIDGE_IP}:{BRIDGE_PORT}/goform/spotifyConfig\r\n"
-        "NT: urn:schemas-upnp-org:device:MediaRenderer:1\r\n"
-        "NTS: ssdp:alive\r\n"
-        f"SERVER: OpenWrt UPnP/1.0 {DEVICE_NAME}/1.0\r\n"
-        "USN: uuid:9ab0c000-f668-11de-9976-ac44f2841425"
-        "::urn:schemas-upnp-org:device:MediaRenderer:1\r\n"
-        "\r\n"
-    ).encode()
-
-
-def make_ssdp_response():
-    return (
-        "HTTP/1.1 200 OK\r\n"
-        "CACHE-CONTROL: max-age=1800\r\n"
-        f"LOCATION: http://{BRIDGE_IP}:{BRIDGE_PORT}/goform/spotifyConfig\r\n"
-        "ST: urn:schemas-upnp-org:device:MediaRenderer:1\r\n"
-        f"SERVER: OpenWrt UPnP/1.0 {DEVICE_NAME}/1.0\r\n"
-        "USN: uuid:9ab0c000-f668-11de-9976-ac44f2841425"
-        "::urn:schemas-upnp-org:device:MediaRenderer:1\r\n"
-        "\r\n"
-    ).encode()
-
-
-def run_ssdp():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 4)
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF,
-                    socket.inet_aton(BRIDGE_IP))
-    sock.bind(("", SSDP_PORT))
-    mreq = socket.inet_aton(SSDP_ADDR) + socket.inet_aton(BRIDGE_IP)
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-    sock.settimeout(1.0)
-
-    notify   = make_ssdp_notify()
-    response = make_ssdp_response()
-    log(f"SSDP started on {BRIDGE_IP}")
-
-    last_notify = 0
-
-    while True:
-        now = time.time()
-        if now - last_notify >= 10:
-            try:
-                sock.sendto(notify, (SSDP_ADDR, SSDP_PORT))
-                last_notify = now
-            except Exception as e:
-                log(f"[SSDP] notify error: {e}")
-
-        try:
-            data, addr = sock.recvfrom(4096)
-            msg = data.decode(errors="replace")
-            if msg.startswith("M-SEARCH") and (
-                "ssdp:all" in msg or "MediaRenderer" in msg
-            ):
-                log(f"[SSDP] M-SEARCH from {addr[0]}, responding")
-                sock.sendto(response, addr)
-        except socket.timeout:
-            pass
-        except Exception as e:
-            log(f"[SSDP] recv error: {e}")
-
-
 # ── Main ────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -324,7 +252,6 @@ if __name__ == "__main__":
     threads = [
         threading.Thread(target=run_proxy, daemon=True),
         threading.Thread(target=run_mdns,  daemon=True),
-        threading.Thread(target=run_ssdp,  daemon=True),
     ]
     for t in threads:
         t.start()
