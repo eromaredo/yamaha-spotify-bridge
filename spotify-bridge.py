@@ -19,9 +19,9 @@ YAMAHA_IP   = "192.168.1.220"
 YAMAHA_PORT = 80
 
 BRIDGE_IP   = "192.168.2.1"  # Router IP in guest network
-BRIDGE_PORT = 8080            # Port to listen on (avoid 80 if LuCI uses it)
+BRIDGE_PORT = 80             # Port to listen on (avoid 80 if LuCI uses it)
 
-DEVICE_NAME = "Yamaha RN-803D"
+INSTANCE_NAME = "SpotifyBridge"
 MDNS_ADDR   = "224.0.0.251"
 MDNS_PORT   = 5353
 # ---------------------
@@ -161,8 +161,8 @@ def txt_entry(s):
     return bytes([len(b)]) + b
 
 
-def build_mdns_response():
-    instance   = f"{DEVICE_NAME}._spotify-connect._tcp.local"
+def build_mdns_response():    
+    instance   = f"{INSTANCE_NAME}._spotify-connect._tcp.local"
     service    = "_spotify-connect._tcp.local"
     host_local = f"{BRIDGE_IP.replace('.', '-')}.local"
     ttl        = 4500
@@ -215,7 +215,7 @@ def run_mdns():
     recv_sock.settimeout(1.0)
 
     packet = build_mdns_response()
-    log(f"mDNS started on {BRIDGE_IP} → announcing '{DEVICE_NAME}'")
+    log(f"mDNS started on {BRIDGE_IP} → announcing '{INSTANCE_NAME}'")
 
     last_announce = 0
 
@@ -245,9 +245,9 @@ def run_mdns():
 
 if __name__ == "__main__":
     log("Starting Spotify Connect Bridge")
-    log(f"  Yamaha:  {YAMAHA_IP}:{YAMAHA_PORT}")
-    log(f"  Bridge:  {BRIDGE_IP}:{BRIDGE_PORT}")
-    log(f"  Device:  {DEVICE_NAME}")
+    log(f"  Yamaha:   {YAMAHA_IP}:{YAMAHA_PORT}")
+    log(f"  Bridge:   {BRIDGE_IP}:{BRIDGE_PORT}")
+    log(f"  Instance: {INSTANCE_NAME}")
 
     threads = [
         threading.Thread(target=run_proxy, daemon=True),

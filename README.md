@@ -114,9 +114,9 @@ YAMAHA_IP   = "192.168.1.220"   # IP of your Yamaha receiver
 YAMAHA_PORT = 80
 
 BRIDGE_IP   = "192.168.2.1"    # Router IP on the guest network
-BRIDGE_PORT = 80                # Port to listen on
+BRIDGE_PORT = 80               # Port to listen on (must be 80)
 
-DEVICE_NAME = "Yamaha RN-803D" # Name shown in Spotify
+INSTANCE_NAME = "SpotifyBridge" # mDSN instance name
 ```
 
 ### 4. Free up port 80 on the guest interface
@@ -213,7 +213,7 @@ The script only proxies HTTP traffic to one specific IP and port (the Yamaha rec
 - Receiver: Yamaha R-N803D (MusicCast)
 - Clients: Android
 
-## What We Tried Before This Solution
+## What Was Tried Before This Solution
 
 This script came out of an extensive troubleshooting session. Here is a summary of what was attempted, why it seemed promising, and why it did not work — so you don't have to repeat the same steps.
 
@@ -270,8 +270,3 @@ This is why all proxy and relay approaches at the network layer fail — Spotify
 - [Spotify Connect Zeroconf Troubleshooting](https://github.com/thlucas1/homeassistantcomponent_spotifyplus/wiki/Spotify-Connect-Zeroconf-Troubleshooting) — detailed breakdown of the Spotify Connect Zeroconf API, manufacturer device list, and the `/goform/spotifyConfig` endpoint used by Yamaha
 - [multicast-relay](https://github.com/alsmith/multicast-relay) — useful for other cross-VLAN discovery problems (Chromecast, AirPlay, DLNA), just not for Yamaha Spotify Connect
 - [OpenWrt forum: Spotify Connect with different VLANs](https://forum.openwrt.org/t/spotify-connect-with-different-vlans-does-not-work-even-with-mdns/169860) — confirms this is a widespread problem with no clean existing solution
-
-## Known limitations
-
-- The Yamaha receiver supports only one active Spotify account at a time. Multiple guest phones can discover the device simultaneously, but only one can play at a time — this is a Yamaha limitation, not a script limitation.
-- If Spotify initiates a direct callback connection to the receiver's real LAN IP (`192.168.1.220`) after discovery, the connection may fail. This has not been observed in testing.
