@@ -2,7 +2,7 @@
 
 > ⚠️ **This script was generated with AI assistance and may contain bugs. It works on the author's setup, but use it at your own risk.**
 
-> This is a proof of concept. The goal was to prove that cross-VLAN Spotify Connect for Yamaha devices can work, and to document how and why. The script works, but it is far from production-ready. It likely has edge cases, error handling gaps, and things that could be done better by someone with deeper knowledge of networking and Python. If you know what you are doing, please feel free to use the work and improve it — you are very welcome. The author lacks the expertise to take this further, and hopes this saves someone else the hours of troubleshooting that went into figuring it out.
+> This is a proof of concept. The goal was to prove that cross-VLAN Spotify Connect for Yamaha devices can work, and to document how and why. The script works, but it is far from production-ready. It likely has edge cases, error handling gaps, and things that could be done better by someone with deeper knowledge of networking and Python. If you know what you are doing, please feel free to use the work and improve it — you are very welcome. I lack the expertise to take this further, and hope this saves someone else the hours of troubleshooting that went into figuring it out.
 
 A lightweight Python script for OpenWrt routers that acts as a Spotify Connect proxy between a guest Wi-Fi network and a Yamaha MusicCast receiver (or any other Spotify Connect device) located on the main LAN.
 
@@ -34,7 +34,7 @@ Yamaha (192.168.1.220:80)        ← real device
 Spotify servers
 ```
 
-## Author's Network Setup
+## Network Setup
 
 The setup described in this project is based on the following network configuration. Your IP addresses and interface names may differ, but the general structure should be the same.
 
@@ -71,24 +71,11 @@ The following rules are relevant to the guest network:
 
 The `guest-spotify-bridge` rule is the only addition required by this project. It allows guest devices to reach the bridge script running on the router's guest IP. No direct access to the LAN or to `192.168.1.220` is granted to guest devices.
 
-### LuCI web interface
-
-By default, LuCI listens on all interfaces including the guest network (port 80). To prevent guest devices from accessing the router admin panel, restrict it to LAN only:
-
-```sh
-uci set uhttpd.main.listen_http='192.168.1.1:80'
-uci set uhttpd.main.listen_https='192.168.1.1:443'
-uci commit uhttpd
-service uhttpd restart
-```
-
-This also frees up port 80 on the guest interface so the bridge script can use it.
-
 ## Requirements
 
 - OpenWrt router with Python 3 installed
 - Router must have an IP on both LAN and guest networks
-- Yamaha receiver (or other Spotify Connect device) on the main LAN
+- Yamaha receiver on the main LAN
 - No external Python packages required — only the standard library
 
 ## Installation
